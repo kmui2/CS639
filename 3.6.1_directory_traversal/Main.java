@@ -49,6 +49,29 @@ public class Main {
 		Path safeDir = Paths.get("safe_programs");
 		Path exePath = safeDir.resolve(programName);
 
+		Path execRealPath;
+		// get real path of executable
+		try {
+			execRealPath = exePath.toRealPath();
+		} catch (IOException ex) {
+			// error getting real path
+			System.out.println("Error running program: " + ex.getMessage());
+			ex.printStackTrace();
+			return -1;
+		}
+
+		// get the parent of the executable
+		Path execParentPath = execRealPath.getParent();
+		
+		// check whether the executable parent directory matches with the safe directory
+		// using absolute path because there is exactly one way to represent it
+		// if not the same, then print error and return -1
+		// else, continue
+		if (!execParentPath.toAbsolutePath().equals(safeDir.toAbsolutePath())) {
+			System.out.println("Bad executable path.");
+			return -1;
+		}
+		
 		// configure program runtime to execute ./safe_programs/programName executable
 		ProcessBuilder procBuild = new ProcessBuilder(exePath.toString());
 
